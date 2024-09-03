@@ -227,35 +227,3 @@ $firebasePushService->markTopicAsDeleted($topic);
 
 echo "Topic marked as deleted.";
 ```
-
-## Explanation of Modules
-
-### 1. FirebasePushService
-
-The FirebasePushService class is the core of this package. It provides methods to:
-
-Send notifications to devices or topics.
-Manage topics by defining, checking, and marking them as deleted. 2. FirebasePushServiceProvider
-The FirebasePushServiceProvider class handles the integration of the package into the Laravel ecosystem. It:
-
-Publishes configuration files and migrations.
-Registers the FirebasePushService with the Laravel service container, allowing it to be easily accessed via dependency injection or the Laravel app() helper. 3. config/firebase_push.php
-This configuration file allows you to manage settings related to Firebase push notifications, such as the Firebase server key.
-
-Contributing
-If you encounter any issues or have suggestions for improvements, feel free to open an issue or submit a pull request.
-
-## Summary
-
-This `README.md` file provides:
-
-- **Installation:** Step-by-step instructions for installing and setting up the package.
-- **Configuration:** Details on configuring the package, including setting the Firebase server key.
-- **Usage:** Sample code for sending notifications, managing topics, and subscribing devices to topics.
-- **Explanation of Modules:** A breakdown of the key components of the package, explaining their purpose and how they fit together.
-
-This document should give users all the information they need to effectively use your Firebase push notification package in their Laravel projects.
-
-```
-
-```
