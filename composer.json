@@ -1,0 +1,15 @@
+{
+  "name": "shijazi/firebase-push",
+  "autoload": {
+    "psr-4": {
+      "Hijazi\\FirebasePush\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "shijazi",
+      "email": "mohamadsafwan.hijazi@gmail.com"
+    }
+  ],
+  "require": {}
+}
