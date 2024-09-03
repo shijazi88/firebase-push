@@ -1,6 +1,7 @@
 <?php
 namespace Hijazi\FirebasePush;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -50,8 +51,11 @@ class FirebasePushService
         return $this->sendNotification($title, $body, [$token]);
     }
 
+    // Subscribe a device to a topic
     public function subscribeToTopic($topic, $tokens)
     {
+        $this->defineTopic($topic); // Ensure the topic is defined in the database
+
         $url = 'https://iid.googleapis.com/iid/v1:batchAdd';
         $data = [
             "to" => "/topics/" . $topic,
@@ -64,22 +68,6 @@ class FirebasePushService
         return $this->handleResponse($response);
     }
 
-    // Subscribe devices to a topic and send notification
-    public function subscribeAndSendNotification($title, $body, $topic, $tokens)
-    {
-        // First, subscribe the tokens to the topic
-        $subscribeResponse = $this->subscribeToTopic($topic, $tokens);
-
-        // Check if subscription was successful
-        if ($subscribeResponse) {
-            // If successful, send the notification to the topic
-            return $this->sendToTopic($title, $body, $topic);
-        } else {
-            // Handle subscription failure
-            Log::error('Failed to subscribe devices to topic: ' . $topic);
-            return false;
-        }
-    }
     // Unsubscribe a device from a topic
     public function unsubscribeFromTopic($topic, $tokens)
     {
@@ -95,9 +83,38 @@ class FirebasePushService
         return $this->handleResponse($response);
     }
 
+    // Subscribe devices to a topic and send notification
+    public function subscribeAndSendNotification($title, $body, $topic, $tokens)
+    {
+        $this->defineTopic($topic); // Ensure the topic is defined in the database
+
+        if (!$this->isTopicActive($topic)) {
+            Log::warning("Attempted to send notification to deleted topic: $topic");
+            return false;
+        }
+
+        // First, subscribe the tokens to the topic
+        $subscribeResponse = $this->subscribeToTopic($topic, $tokens);
+
+        // Check if subscription was successful
+        if ($subscribeResponse) {
+            // If successful, send the notification to the topic
+            return $this->sendToTopic($title, $body, $topic);
+        } else {
+            // Handle subscription failure
+            Log::error('Failed to subscribe devices to topic: ' . $topic);
+            return false;
+        }
+    }
+
     // Send notification to a Firebase topic
     public function sendToTopic($title, $body, $topic)
     {
+        if (!$this->isTopicActive($topic)) {
+            Log::warning("Attempted to send notification to deleted topic: $topic");
+            return false;
+        }
+
         $url = 'https://fcm.googleapis.com/fcm/send';
         $data = [
             "to" => "/topics/" . $topic,
@@ -130,6 +147,44 @@ class FirebasePushService
             ->post($url, $data);
 
         return $this->handleResponse($response);
+    }
+
+    // Define a topic in the database if it doesn't exist
+    protected function defineTopic($topic)
+    {
+        $existingTopic = DB::table('firebase_topics')->where('topic_name', $topic)->first();
+
+        if (!$existingTopic) {
+            DB::table('firebase_topics')->insert([
+                'topic_name' => $topic,
+                'is_deleted' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } elseif ($existingTopic->is_deleted) {
+            // If the topic is marked as deleted, reactivate it
+            DB::table('firebase_topics')->where('topic_name', $topic)->update([
+                'is_deleted' => false,
+                'updated_at' => now(),
+            ]);
+        }
+    }
+
+    // Check if a topic is active (not deleted)
+    protected function isTopicActive($topic)
+    {
+        return DB::table('firebase_topics')
+            ->where('topic_name', $topic)
+            ->where('is_deleted', false)
+            ->exists();
+    }
+
+    // Mark a topic as deleted
+    public function markTopicAsDeleted($topic)
+    {
+        DB::table('firebase_topics')
+            ->where('topic_name', $topic)
+            ->update(['is_deleted' => true, 'updated_at' => now()]);
     }
 
     // Helper methods
