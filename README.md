@@ -49,10 +49,11 @@ Once the migration is published, run it to create the firebase_topics table:
 php artisan migrate
 ```
 
-### Configuration
+## 4. Configuration
 
-1. Firebase Server Key
-   Add your Firebase Server Key to your .env file:
+### 1. Firebase Server Key
+
+Add your Firebase Server Key to your .env file:
 
 ```bash
 FIREBASE_SERVER_KEY=your-firebase-server-key
@@ -60,15 +61,16 @@ FIREBASE_SERVER_KEY=your-firebase-server-key
 
 This key is necessary for authenticating requests to Firebase Cloud Messaging (FCM).
 
-2. Config File
-   The configuration file config/firebase_push.php is published to your Laravel application. It contains basic configuration options, including the server key and other relevant settings.
+### 2. Config File
 
-### Usage
+The configuration file config/firebase_push.php is published to your Laravel application. It contains basic configuration options, including the server key and other relevant settings.
 
-Sending Notifications
+## 5. Usage
 
-1. Send Notification to Multiple Devices
-   To send the same notification to multiple devices, use the sendNotification method:
+## Sending Notifications
+
+Send Notification to Multiple Devices
+To send the same notification to multiple devices, use the sendNotification method:
 
 ```php
 use Hijazi\FirebasePush\FirebasePushService;
@@ -87,8 +89,9 @@ echo "Failed to send notification.";
 }
 ```
 
-2. Send Different Notifications to Multiple Devices
-   To send different notifications to multiple devices, use the sendToMultipleDevices method:
+## 2. Send Different Notifications to Multiple Devices
+
+To send different notifications to multiple devices, use the sendToMultipleDevices method:
 
 ```php
 use Hijazi\FirebasePush\FirebasePushService;
@@ -120,8 +123,9 @@ echo "Failed to send notification.";
 
 ```
 
-3. Send Notification to a Single Device
-   To send a notification to a single device, use the sendToSingleDevice method:
+## 3. Send Notification to a Single Device
+
+To send a notification to a single device, use the sendToSingleDevice method:
 
 ```php
 use Hijazi\FirebasePush\FirebasePushService;
@@ -140,8 +144,9 @@ echo "Failed to send notification.";
 }
 ```
 
-4. Send Notification with Custom Data
-   To send custom data along with the notification, use the sendWithCustomData method:
+## 4. Send Notification with Custom Data
+
+To send custom data along with the notification, use the sendWithCustomData method:
 
 ```php
 use Hijazi\FirebasePush\FirebasePushService;
@@ -161,11 +166,13 @@ echo "Failed to send notification.";
 }
 ```
 
-Managing Topics
+## Managing Topics
+
 The package automatically manages topics in your database. You can define topics, check if they are active, and mark them as deleted.
 
-1. Send Notification to a Topic
-   To send a notification to all devices subscribed to a topic, use the sendToTopic method:
+### 1. Send Notification to a Topic
+
+To send a notification to all devices subscribed to a topic, use the sendToTopic method:
 
 ```php
 use Hijazi\FirebasePush\FirebasePushService;
@@ -184,8 +191,9 @@ echo "Failed to send notification to the topic.";
 }
 ```
 
-2. Subscribe Devices to a Topic and Send Notification
-   To subscribe devices to a topic and then send a notification to that topic, use the subscribeAndSendNotification method:
+### 2. Subscribe Devices to a Topic and Send Notification
+
+To subscribe devices to a topic and then send a notification to that topic, use the subscribeAndSendNotification method:
 
 ```php
 use Hijazi\FirebasePush\FirebasePushService;
@@ -205,8 +213,9 @@ echo "Failed to subscribe devices or send notification.";
 }
 ```
 
-3. Mark Topic as Deleted
-   To mark a topic as deleted, preventing further notifications from being sent to that topic, use the markTopicAsDeleted method:
+### 3. Mark Topic as Deleted
+
+To mark a topic as deleted, preventing further notifications from being sent to that topic, use the markTopicAsDeleted method:
 
 ```php
 use Hijazi\FirebasePush\FirebasePushService;
@@ -221,8 +230,9 @@ echo "Topic marked as deleted.";
 
 ## Explanation of Modules
 
-1. FirebasePushService
-   The FirebasePushService class is the core of this package. It provides methods to:
+### 1. FirebasePushService
+
+The FirebasePushService class is the core of this package. It provides methods to:
 
 Send notifications to devices or topics.
 Manage topics by defining, checking, and marking them as deleted. 2. FirebasePushServiceProvider
