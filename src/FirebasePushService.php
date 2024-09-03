@@ -5,6 +5,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+use Google\Auth\ApplicationDefaultCredentials;
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+
+
 class FirebasePushService
 {
     protected $serverKey;
@@ -226,5 +231,51 @@ class FirebasePushService
         }
 
         return $response->json();
+    }
+
+    public function sendNotificationV1($title, $body, $tokens, $serviceAccountPath, $projectId, array $data = [])
+    {
+        $client = new Client([
+            'handler' => HandlerStack::create(),
+            'auth'    => 'google_auth'
+        ]);
+
+        $scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
+        $jsonKey = json_decode(file_get_contents($serviceAccountPath), true);
+        $credentials = ApplicationDefaultCredentials::makeCredentials($scopes, $jsonKey);
+
+        $middleware = new AuthTokenMiddleware($credentials);
+        $client->getConfig('handler')->push($middleware);
+
+        $accessToken = $credentials->fetchAuthToken()['access_token'];
+
+        $url = 'https://fcm.googleapis.com/v1/projects/' . $projectId . '/messages:send';
+        $headers = [
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Content-Type' => 'application/json'
+        ];
+
+        $notification = [
+            "message" => [
+                "token" => $tokens, // This could be an array of tokens
+                "notification" => [
+                    "title" => $title,
+                    "body" => $body
+                ],
+                "data" => $data // Additional data payload
+            ]
+        ];
+
+        try {
+            $response = $client->post($url, [
+                'headers' => $headers,
+                'json' => $notification
+            ]);
+
+            return json_decode($response->getBody(), true);
+        } catch (\Exception $e) {
+            Log::error('Failed to send notification: ' . $e->getMessage());
+            return false;
+        }
     }
 }
