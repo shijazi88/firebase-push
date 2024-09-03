@@ -10,6 +10,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use Google\Auth\Credentials\ServiceAccountJwtAccessCredentials;
 
+use Google\Auth\Middleware\AuthTokenMiddleware;
 
 
 // This class is used to send push notifications to Android and iOS devices using Firebase Cloud Messaging (FCM).
