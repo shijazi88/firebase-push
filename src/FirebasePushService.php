@@ -233,20 +233,26 @@ class FirebasePushService
         return $response->json();
     }
 
+    
+
+
+    // New method for sending notifications using the FCM API (V1)
     public function sendNotificationV1($title, $body, $tokens, $serviceAccountPath, $projectId, array $data = [])
     {
+        // Load the service account credentials
+        $jsonKey = file_get_contents($serviceAccountPath);
+        $credentials = new ServiceAccountJwtAccessCredentials(json_decode($jsonKey, true));
+
+        // Create a Guzzle HTTP client with the credentials
         $client = new Client([
             'handler' => HandlerStack::create(),
             'auth'    => 'google_auth'
         ]);
 
-        $scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
-        $jsonKey = json_decode(file_get_contents($serviceAccountPath), true);
-        $credentials = ApplicationDefaultCredentials::makeCredentials($scopes, $jsonKey);
-
-        $middleware = new AuthTokenMiddleware($credentials);
+        $middleware = new \Google\Auth\Middleware\AuthTokenMiddleware($credentials);
         $client->getConfig('handler')->push($middleware);
 
+        // Prepare the authorization header
         $accessToken = $credentials->fetchAuthToken()['access_token'];
 
         $url = 'https://fcm.googleapis.com/v1/projects/' . $projectId . '/messages:send';
@@ -255,6 +261,7 @@ class FirebasePushService
             'Content-Type' => 'application/json'
         ];
 
+        // Prepare the notification payload
         $notification = [
             "message" => [
                 "token" => $tokens, // This could be an array of tokens
@@ -266,6 +273,7 @@ class FirebasePushService
             ]
         ];
 
+        // Send the notification
         try {
             $response = $client->post($url, [
                 'headers' => $headers,
