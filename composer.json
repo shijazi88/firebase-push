@@ -1,5 +1,7 @@
 {
   "name": "shijazi/firebase-push",
+  "description": "A Laravel package for sending push notifications with Firebase.",
+  "license": "MIT",
   "autoload": {
     "psr-4": {
       "Hijazi\\FirebasePush\\": "src/"
@@ -11,5 +13,16 @@
       "email": "mohamadsafwan.hijazi@gmail.com"
     }
   ],
-  "require": {}
+  "require": {
+    "php": "^7.4|^8.0",
+    "illuminate/support": "^8.0|^9.0|^10.0"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "keywords": [
+    "laravel",
+    "firebase",
+    "push",
+    "notifications"
+  ]
 }
