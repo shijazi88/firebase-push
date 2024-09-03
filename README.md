@@ -1,7 +1,3 @@
-Here’s an updated README file that includes the details about using both the Legacy (Current) API and the FCM V1 API implementations, along with the necessary instructions and example code:
-
----
-
 # Firebase Push Notification Package for Laravel
 
 This package provides a comprehensive solution for managing and sending Firebase push notifications in Laravel applications. It includes functionality for topic management, sending notifications, subscribing devices to topics, and ensuring that notifications are only sent to active (non-deleted) topics. The package supports both the Legacy (Current) API and the Firebase Cloud Messaging (FCM) V1 API.
@@ -240,7 +236,3 @@ If you encounter any issues or have suggestions for improvements, feel free to o
 ### License
 
 This package is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
----
-
-This updated README provides a comprehensive guide on how to use both the Legacy API and FCM V1 API implementations in your Laravel application. It also includes clear examples and instructions for managing topics and sending notifications.
