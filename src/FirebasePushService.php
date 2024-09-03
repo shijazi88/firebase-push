@@ -50,6 +50,51 @@ class FirebasePushService
         return $this->sendNotification($title, $body, [$token]);
     }
 
+    public function subscribeToTopic($topic, $tokens)
+    {
+        $url = 'https://iid.googleapis.com/iid/v1:batchAdd';
+        $data = [
+            "to" => "/topics/" . $topic,
+            "registration_tokens" => $tokens
+        ];
+
+        $response = Http::withHeaders($this->prepareHeaders())
+            ->post($url, $data);
+
+        return $this->handleResponse($response);
+    }
+
+    // Subscribe devices to a topic and send notification
+    public function subscribeAndSendNotification($title, $body, $topic, $tokens)
+    {
+        // First, subscribe the tokens to the topic
+        $subscribeResponse = $this->subscribeToTopic($topic, $tokens);
+
+        // Check if subscription was successful
+        if ($subscribeResponse) {
+            // If successful, send the notification to the topic
+            return $this->sendToTopic($title, $body, $topic);
+        } else {
+            // Handle subscription failure
+            Log::error('Failed to subscribe devices to topic: ' . $topic);
+            return false;
+        }
+    }
+    // Unsubscribe a device from a topic
+    public function unsubscribeFromTopic($topic, $tokens)
+    {
+        $url = 'https://iid.googleapis.com/iid/v1:batchRemove';
+        $data = [
+            "to" => "/topics/" . $topic,
+            "registration_tokens" => $tokens
+        ];
+
+        $response = Http::withHeaders($this->prepareHeaders())
+            ->post($url, $data);
+
+        return $this->handleResponse($response);
+    }
+
     // Send notification to a Firebase topic
     public function sendToTopic($title, $body, $topic)
     {
