@@ -242,21 +242,34 @@ class FirebasePushService
     // New method for sending notifications using the FCM API (V1)
     public function sendNotificationV1($title, $body, $tokens, $serviceAccountPath, $projectId, array $data = [])
     {
-        // Load the service account credentials
+        if (!file_exists($serviceAccountPath)) {
+            Log::error('Service account JSON file not found at path: ' . $serviceAccountPath);
+            return false;
+        }
+
         $jsonKey = file_get_contents($serviceAccountPath);
         $credentials = new ServiceAccountJwtAccessCredentials(json_decode($jsonKey, true));
 
-        // Create a Guzzle HTTP client with the credentials
         $client = new Client([
             'handler' => HandlerStack::create(),
             'auth'    => 'google_auth'
         ]);
 
-        $middleware = new \Google\Auth\Middleware\AuthTokenMiddleware($credentials);
+        $middleware = new AuthTokenMiddleware($credentials);
         $client->getConfig('handler')->push($middleware);
 
-        // Prepare the authorization header
-        $accessToken = $credentials->fetchAuthToken()['access_token'];
+        try {
+            $tokenResponse = $credentials->fetchAuthToken();
+            if (isset($tokenResponse['access_token'])) {
+                $accessToken = $tokenResponse['access_token'];
+            } else {
+                Log::error('Failed to fetch access token', $tokenResponse);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Log::error('Exception occurred while fetching access token: ' . $e->getMessage());
+            return false;
+        }
 
         $url = 'https://fcm.googleapis.com/v1/projects/' . $projectId . '/messages:send';
         $headers = [
@@ -264,19 +277,17 @@ class FirebasePushService
             'Content-Type' => 'application/json'
         ];
 
-        // Prepare the notification payload
         $notification = [
             "message" => [
-                "token" => $tokens, // This could be an array of tokens
+                "token" => $tokens,
                 "notification" => [
                     "title" => $title,
                     "body" => $body
                 ],
-                "data" => $data // Additional data payload
+                "data" => $data
             ]
         ];
 
-        // Send the notification
         try {
             $response = $client->post($url, [
                 'headers' => $headers,
