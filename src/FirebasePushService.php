@@ -12,9 +12,10 @@ class FirebasePushService
     protected $serverKey;
     protected $loggingEnabled;
 
-    public function __construct($loggingEnabled = true)
+    public function __construct($loggingEnabled = true, $serverKey)
     {
         $this->loggingEnabled = $loggingEnabled;
+        $this->serverKey = $serverKey;
     }
 
     protected function logInfo($message, $context = [])

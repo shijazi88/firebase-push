@@ -11,9 +11,11 @@ class FirebasePushServiceProvider extends ServiceProvider
         // Merge package configuration with application's published configuration
         $this->mergeConfigFrom(__DIR__.'/../config/firebase_push.php', 'firebase_push');
 
-        // Register the service with the server key from the configuration
+        // Register the service with the server key and logging configuration
         $this->app->singleton(FirebasePushService::class, function ($app) {
-            return new FirebasePushService(config('firebase_push.server_key'));
+            $serverKey = config('firebase_push.server_key');
+            $loggingEnabled = config('firebase_push.logging');
+            return new FirebasePushService($loggingEnabled, $serverKey);
         });
     }
 
