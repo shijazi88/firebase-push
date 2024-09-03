@@ -16,7 +16,6 @@ class FirebasePushService
 
     public function sendNotification($title, $body, $tokens)
     {
-        return 'sending notification';
         if (count($tokens) === 0) {
             return;
         }
