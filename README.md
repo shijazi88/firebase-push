@@ -90,7 +90,7 @@ echo "Failed to send notification.";
 2. Send Different Notifications to Multiple Devices
    To send different notifications to multiple devices, use the sendToMultipleDevices method:
 
-````php
+```php
 use Hijazi\FirebasePush\FirebasePushService;
 
 $firebasePushService = app(FirebasePushService::class);
@@ -121,7 +121,7 @@ echo "Failed to send notification.";
 ```
 
 3. Send Notification to a Single Device
-To send a notification to a single device, use the sendToSingleDevice method:
+   To send a notification to a single device, use the sendToSingleDevice method:
 
 ```php
 use Hijazi\FirebasePush\FirebasePushService;
@@ -139,8 +139,9 @@ echo "Notification sent successfully.";
 echo "Failed to send notification.";
 }
 ```
+
 4. Send Notification with Custom Data
-To send custom data along with the notification, use the sendWithCustomData method:
+   To send custom data along with the notification, use the sendWithCustomData method:
 
 ```php
 use Hijazi\FirebasePush\FirebasePushService;
@@ -160,7 +161,7 @@ echo "Failed to send notification.";
 }
 ```
 
- Managing Topics
+Managing Topics
 The package automatically manages topics in your database. You can define topics, check if they are active, and mark them as deleted.
 
 1. Send Notification to a Topic
@@ -182,8 +183,9 @@ echo "Notification sent successfully to the topic.";
 echo "Failed to send notification to the topic.";
 }
 ```
+
 2. Subscribe Devices to a Topic and Send Notification
-To subscribe devices to a topic and then send a notification to that topic, use the subscribeAndSendNotification method:
+   To subscribe devices to a topic and then send a notification to that topic, use the subscribeAndSendNotification method:
 
 ```php
 use Hijazi\FirebasePush\FirebasePushService;
@@ -204,7 +206,7 @@ echo "Failed to subscribe devices or send notification.";
 ```
 
 3. Mark Topic as Deleted
-To mark a topic as deleted, preventing further notifications from being sent to that topic, use the markTopicAsDeleted method:
+   To mark a topic as deleted, preventing further notifications from being sent to that topic, use the markTopicAsDeleted method:
 
 ```php
 use Hijazi\FirebasePush\FirebasePushService;
@@ -243,4 +245,7 @@ This `README.md` file provides:
 - **Explanation of Modules:** A breakdown of the key components of the package, explaining their purpose and how they fit together.
 
 This document should give users all the information they need to effectively use your Firebase push notification package in their Laravel projects.
-````
+
+```
+
+```
