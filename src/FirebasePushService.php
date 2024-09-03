@@ -1,5 +1,4 @@
 <?php
-
 namespace Hijazi\FirebasePush;
 
 use Illuminate\Support\Facades\Http;
@@ -20,23 +19,27 @@ class FirebasePushService
             return;
         }
 
-        try {
-            $response = $this->makeRequest($title, $body, $tokens);
+        $response = $this->makeRequest($title, $body, $tokens);
 
-            if ($response->failed()) {
-                Log::error('Firebase notification failed', [
-                    'response' => $response->body(),
-                ]);
-                return false;
+        return $this->handleResponse($response);
+    }
+
+    public function sendToMultipleDevices(array $notifications)
+    {
+        $responses = [];
+
+        foreach ($notifications as $notification) {
+            $title = $notification['title'] ?? 'Default Title';
+            $body = $notification['body'] ?? 'Default Body';
+            $tokens = $notification['tokens'] ?? [];
+
+            if (count($tokens) > 0) {
+                $response = $this->makeRequest($title, $body, $tokens);
+                $responses[] = $this->handleResponse($response);
             }
-
-            return $response->json();
-        } catch (\Exception $e) {
-            Log::error('Error sending Firebase notification', [
-                'error' => $e->getMessage(),
-            ]);
-            return false;
         }
+
+        return $responses;
     }
 
     protected function makeRequest($title, $body, $tokens)
@@ -65,5 +68,17 @@ class FirebasePushService
             'Authorization' => 'key=' . $this->serverKey,
             'Content-Type' => 'application/json',
         ];
+    }
+
+    protected function handleResponse($response)
+    {
+        if ($response->failed()) {
+            Log::error('Firebase notification failed', [
+                'response' => $response->body(),
+            ]);
+            return false;
+        }
+
+        return $response->json();
     }
 }
