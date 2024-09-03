@@ -67,7 +67,7 @@ The configuration file config/firebase_push.php is published to your Laravel app
 
 ## 5. Usage
 
-## Sending Notifications
+## 1. Sending Notifications
 
 Send Notification to Multiple Devices
 To send the same notification to multiple devices, use the sendNotification method:
