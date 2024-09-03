@@ -8,8 +8,11 @@ use Illuminate\Support\Facades\Log;
 use Google\Auth\ApplicationDefaultCredentials;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
+use Google\Auth\Credentials\ServiceAccountJwtAccessCredentials;
 
 
+
+// This class is used to send push notifications to Android and iOS devices using Firebase Cloud Messaging (FCM).
 class FirebasePushService
 {
     protected $serverKey;
