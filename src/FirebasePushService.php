@@ -197,7 +197,7 @@ class FirebasePushService
 
         $notification = [
             "message" => [
-                "token" => 'diIn3cFzTAyiIEkVOXhI_m:APA91bErVntrjpSM_Ip-QMc0Yl1LAUq7pB-hnpjz-mtTZsiZpEf1pTjNCiASNWgS_AQ8EMaLo33B3y_UMeLPst-A6XKWpCUSHcqrGMprhdJVhfj8LSyoM2l4bx-g6emlYyDApFhSsc9p',
+                "token" => $tokens,
                 "notification" => [
                     "title" => $title,
                     "body" => $body
