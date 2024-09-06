@@ -247,7 +247,7 @@ class FirebasePushService
 
         $payload = [
             "to" => "/topics/" . $topic,
-            "registration_tokens" => $tokens,
+            "registration_tokens" => is_array($tokens) ? $tokens : [$tokens], // Ensure tokens are in an array
         ];
 
         $this->logInfo('Topic management payload prepared.', $payload);
@@ -267,6 +267,7 @@ class FirebasePushService
             return false;
         }
     }
+
 
     public function sendToTopicV1($title, $body, $topic, array $data = [])
     {
