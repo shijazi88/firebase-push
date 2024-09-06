@@ -1,5 +1,6 @@
 <?php
 
+
 namespace Hijazi\FirebasePush;
 
 use Google\Auth\Credentials\ServiceAccountJwtAccessCredentials;
@@ -21,7 +22,7 @@ class FirebasePushService
         // Load config values
         $this->loggingEnabled = config('firebase_push.logging');
         $this->serverKey = config('firebase_push.server_key');
-        $this->serviceAccountPath = config('firebase_push.service_account_path');
+        $this->serviceAccountPath = storage_path(config('firebase_push.service_account_path'));
         $this->projectId = config('firebase_push.project_id');
     }
 
@@ -41,7 +42,6 @@ class FirebasePushService
 
     // ----------- Legacy (Current) API Implementation ------------
 
-    // Send notification using the legacy FCM API
     public function sendNotificationLegacy($title, $body, $tokens, array $data = [])
     {
         if (empty($tokens)) {
@@ -86,10 +86,8 @@ class FirebasePushService
 
     // ----------- FCM V1 API Implementation ------------
 
-    // Send notification using FCM V1 API
     public function sendNotificationV1($title, $body, $token, array $data = [])
     {
-        // Check if the service account JSON file exists
         if (!file_exists($this->serviceAccountPath)) {
             $this->logError('Service account JSON file not found at path: ' . $this->serviceAccountPath);
             return false;
@@ -144,27 +142,24 @@ class FirebasePushService
             'Content-Type' => 'application/json'
         ];
 
-        // Ensure the token is not empty
         if (empty($token)) {
             $this->logError('Token is empty.');
             return false;
         }
 
-        // Ensure title and body are not empty
         if (empty($title) || empty($body)) {
             $this->logError('Notification title or body is empty.');
             return false;
         }
 
-        // Prepare notification payload
         $notification = [
             "message" => [
-                "token" => $token, // Single token as a string
+                "token" => $token,
                 "notification" => [
                     "title" => $title,
                     "body" => $body
                 ],
-                "data" => $data ?: new \stdClass() // Make sure data is an associative array or empty object
+                "data" => $data ?: new \stdClass()
             ]
         ];
 
@@ -186,19 +181,16 @@ class FirebasePushService
         }
     }
 
-    // Subscribe devices to a topic using FCM V1 API
     public function subscribeToTopicV1($topic, $tokens)
     {
         return $this->topicManagementV1('projects/' . $this->projectId . '/messages:subscribeToTopic', $topic, $tokens);
     }
 
-    // Unsubscribe devices from a topic using FCM V1 API
     public function unsubscribeFromTopicV1($topic, $tokens)
     {
         return $this->topicManagementV1('projects/' . $this->projectId . '/messages:unsubscribeFromTopic', $topic, $tokens);
     }
 
-    // Topic management helper for V1 API
     private function topicManagementV1($urlSuffix, $topic, $tokens)
     {
         if (!file_exists($this->serviceAccountPath)) {
@@ -277,7 +269,6 @@ class FirebasePushService
         }
     }
 
-    // Send notification to a topic using FCM V1 API
     public function sendToTopicV1($title, $body, $topic, array $data = [])
     {
         if (!file_exists($this->serviceAccountPath)) {
@@ -362,10 +353,8 @@ class FirebasePushService
         }
     }
 
-    // Mark a topic as deleted in the database
     public function markTopicAsDeleted($topic)
     {
-        // Assume there is a model Topic that tracks topics in the database
         $topicRecord = Topic::where('name', $topic)->first();
         if ($topicRecord) {
             $topicRecord->deleted_at = now();
