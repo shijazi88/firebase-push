@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Hijazi\FirebasePush;
 
 use Google\Auth\Credentials\ServiceAccountJwtAccessCredentials;
@@ -93,7 +92,6 @@ class FirebasePushService
             return false;
         }
 
-        // Load the service account credentials
         $jsonKey = file_get_contents($this->serviceAccountPath);
         $decodedJson = json_decode($jsonKey, true);
 
@@ -183,12 +181,12 @@ class FirebasePushService
 
     public function subscribeToTopicV1($topic, $tokens)
     {
-        return $this->topicManagementV1('projects/' . $this->projectId . '/messages:subscribeToTopic', $topic, $tokens);
+        return $this->topicManagementV1('subscribe', $topic, $tokens);
     }
 
     public function unsubscribeFromTopicV1($topic, $tokens)
     {
-        return $this->topicManagementV1('projects/' . $this->projectId . '/messages:unsubscribeFromTopic', $topic, $tokens);
+        return $this->topicManagementV1('unsubscribe', $topic, $tokens);
     }
 
     private function topicManagementV1($action, $topic, $tokens)
@@ -240,7 +238,6 @@ class FirebasePushService
 
         $this->logInfo('Access token successfully fetched.');
 
-        // Correct URL for subscribing or unsubscribing to topics
         $url = $action === 'subscribe' ? 'https://iid.googleapis.com/iid/v1:batchAdd' : 'https://iid.googleapis.com/iid/v1:batchRemove';
 
         $headers = [
@@ -250,7 +247,7 @@ class FirebasePushService
 
         $payload = [
             "to" => "/topics/" . $topic,
-            "registration_tokens" => $tokens, // Use 'registration_tokens' for multiple tokens
+            "registration_tokens" => $tokens,
         ];
 
         $this->logInfo('Topic management payload prepared.', $payload);
@@ -270,7 +267,6 @@ class FirebasePushService
             return false;
         }
     }
-
 
     public function sendToTopicV1($title, $body, $topic, array $data = [])
     {
