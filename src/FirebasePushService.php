@@ -244,7 +244,7 @@ class FirebasePushService
             'Authorization' => 'Bearer ' . $accessToken,
             'Content-Type' => 'application/json'
         ];
-
+        $this->logInfo('Topic management payload prepared header.', $headers);
         $payload = [
             "to" => "/topics/" . $topic,
             "registration_tokens" => is_array($tokens) ? $tokens : [$tokens], // Ensure tokens are in an array
