@@ -191,7 +191,7 @@ class FirebasePushService
         return $this->topicManagementV1('projects/' . $this->projectId . '/messages:unsubscribeFromTopic', $topic, $tokens);
     }
 
-    private function topicManagementV1($urlSuffix, $topic, $tokens)
+    private function topicManagementV1($topic, $tokens)
     {
         if (!file_exists($this->serviceAccountPath)) {
             $this->logError('Service account JSON file not found at path: ' . $this->serviceAccountPath);
@@ -240,15 +240,16 @@ class FirebasePushService
 
         $this->logInfo('Access token successfully fetched.');
 
-        $url = 'https://fcm.googleapis.com/v1/' . $urlSuffix;
+        // Correct URL for topic management
+        $url = 'https://iid.googleapis.com/v1/projects/' . $this->projectId . '/rel/topics/' . $topic;
+
         $headers = [
             'Authorization' => 'Bearer ' . $accessToken,
             'Content-Type' => 'application/json'
         ];
 
         $payload = [
-            "topic" => $topic,
-            "tokens" => $tokens,
+            "registration_tokens" => $tokens, // Use 'registration_tokens' for multiple tokens
         ];
 
         $this->logInfo('Topic management payload prepared.', $payload);
@@ -268,6 +269,7 @@ class FirebasePushService
             return false;
         }
     }
+
 
     public function sendToTopicV1($title, $body, $topic, array $data = [])
     {
