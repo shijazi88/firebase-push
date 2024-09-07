@@ -179,15 +179,15 @@ class FirebasePushService
         }
     }
 
-    public function subscribeToTopicV1($topic, $tokens)
-    {
-        return $this->topicManagementV1('subscribe', $topic, $tokens);
-    }
+//    public function subscribeToTopicV1($topic, $tokens)
+//    {
+//        return $this->topicManagementV1('subscribe', $topic, $tokens);
+//    }
 
-    public function unsubscribeFromTopicV1($topic, $tokens)
-    {
-        return $this->topicManagementV1('unsubscribe', $topic, $tokens);
-    }
+//    public function unsubscribeFromTopicV1($topic, $tokens)
+//    {
+//        return $this->topicManagementV1('unsubscribe', $topic, $tokens);
+//    }
 
     private function topicManagementV1($action, $topic, $tokens)
     {
@@ -268,90 +268,149 @@ class FirebasePushService
         }
     }
 
+//    public function sendToTopicV1($title, $body, $topic, array $data = [])
+//    {
+//        if (!file_exists($this->serviceAccountPath)) {
+//            $this->logError('Service account JSON file not found at path: ' . $this->serviceAccountPath);
+//            return false;
+//        }
+//
+//        $jsonKey = file_get_contents($this->serviceAccountPath);
+//        $decodedJson = json_decode($jsonKey, true);
+//
+//        if ($decodedJson === null) {
+//            $this->logError('Failed to decode JSON from service account file.');
+//            return false;
+//        }
+//
+//        $this->logInfo('Service account JSON successfully loaded.');
+//
+//        $scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
+//        $credentials = new ServiceAccountJwtAccessCredentials($decodedJson, $scopes);
+//
+//        $client = new Client([
+//            'handler' => HandlerStack::create(),
+//            'auth'    => 'google_auth'
+//        ]);
+//
+//        $middleware = new AuthTokenMiddleware($credentials);
+//        $client->getConfig('handler')->push($middleware);
+//
+//        try {
+//            $tokenResponse = $credentials->fetchAuthToken();
+//
+//            if (!is_array($tokenResponse)) {
+//                $this->logError('Token response is not an array: ' . print_r($tokenResponse, true));
+//                return false;
+//            }
+//
+//            if (isset($tokenResponse['access_token'])) {
+//                $accessToken = $tokenResponse['access_token'];
+//            } else {
+//                $this->logError('Failed to fetch access token. Response: ' . print_r($tokenResponse, true));
+//                return false;
+//            }
+//        } catch (\Exception $e) {
+//            $this->logError('Exception occurred while fetching access token: ' . $e->getMessage());
+//            return false;
+//        }
+//
+//        $this->logInfo('Access token successfully fetched.');
+//
+//        $url = 'https://fcm.googleapis.com/v1/projects/' . $this->projectId . '/messages:send';
+//        $headers = [
+//            'Authorization' => 'Bearer ' . $accessToken,
+//            'Content-Type' => 'application/json'
+//        ];
+//
+//        $notification = [
+//            "message" => [
+//                "topic" => $topic,
+//                "notification" => [
+//                    "title" => $title,
+//                    "body" => $body
+//                ],
+//                "data" => $data
+//            ]
+//        ];
+//
+//        $this->logInfo('Notification payload for topic prepared.', $notification);
+//
+//        try {
+//            $response = $client->post($url, [
+//                'headers' => $headers,
+//                'json' => $notification
+//            ]);
+//
+//            $responseBody = json_decode($response->getBody(), true);
+//            $this->logInfo('Notification sent to topic successfully.', $responseBody);
+//
+//            return $responseBody;
+//        } catch (\Exception $e) {
+//            $this->logError('Failed to send notification to topic: ' . $e->getMessage());
+//            return false;
+//        }
+//    }
+
+
+    // ----------- Topic Management with Kreait Firebase SDK ------------
+
+    public function subscribeToTopicV1($topic, $tokens)
+    {
+        return $this->manageTopicV1('subscribe', $topic, $tokens);
+    }
+
+    public function unsubscribeFromTopicV1($topic, $tokens)
+    {
+        return $this->manageTopicV1('unsubscribe', $topic, $tokens);
+    }
+
+    private function manageTopicV1($action, $topic, $tokens)
+    {
+        try {
+            // Get Firebase messaging instance
+            $messaging = Firebase::messaging();
+
+            // Handle subscription and unsubscription
+            if ($action === 'subscribe') {
+                $response = $messaging->subscribeToTopic($topic, $tokens);
+            } else {
+                $response = $messaging->unsubscribeFromTopic($topic, $tokens);
+            }
+
+            $this->logInfo("Topic management ($action) successful", $response);
+            return $response;
+        } catch (\Exception $e) {
+            $this->logError('Topic management failed: ' . $e->getMessage());
+            return false;
+        }
+    }
 
     public function sendToTopicV1($title, $body, $topic, array $data = [])
     {
-        if (!file_exists($this->serviceAccountPath)) {
-            $this->logError('Service account JSON file not found at path: ' . $this->serviceAccountPath);
-            return false;
-        }
-
-        $jsonKey = file_get_contents($this->serviceAccountPath);
-        $decodedJson = json_decode($jsonKey, true);
-
-        if ($decodedJson === null) {
-            $this->logError('Failed to decode JSON from service account file.');
-            return false;
-        }
-
-        $this->logInfo('Service account JSON successfully loaded.');
-
-        $scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
-        $credentials = new ServiceAccountJwtAccessCredentials($decodedJson, $scopes);
-
-        $client = new Client([
-            'handler' => HandlerStack::create(),
-            'auth'    => 'google_auth'
-        ]);
-
-        $middleware = new AuthTokenMiddleware($credentials);
-        $client->getConfig('handler')->push($middleware);
-
         try {
-            $tokenResponse = $credentials->fetchAuthToken();
-
-            if (!is_array($tokenResponse)) {
-                $this->logError('Token response is not an array: ' . print_r($tokenResponse, true));
-                return false;
-            }
-
-            if (isset($tokenResponse['access_token'])) {
-                $accessToken = $tokenResponse['access_token'];
-            } else {
-                $this->logError('Failed to fetch access token. Response: ' . print_r($tokenResponse, true));
-                return false;
-            }
-        } catch (\Exception $e) {
-            $this->logError('Exception occurred while fetching access token: ' . $e->getMessage());
-            return false;
-        }
-
-        $this->logInfo('Access token successfully fetched.');
-
-        $url = 'https://fcm.googleapis.com/v1/projects/' . $this->projectId . '/messages:send';
-        $headers = [
-            'Authorization' => 'Bearer ' . $accessToken,
-            'Content-Type' => 'application/json'
-        ];
-
-        $notification = [
-            "message" => [
-                "topic" => $topic,
-                "notification" => [
-                    "title" => $title,
-                    "body" => $body
+            // Prepare Firebase message
+            $message = CloudMessage::fromArray([
+                'topic' => $topic,
+                'notification' => [
+                    'title' => $title,
+                    'body' => $body
                 ],
-                "data" => $data
-            ]
-        ];
-
-        $this->logInfo('Notification payload for topic prepared.', $notification);
-
-        try {
-            $response = $client->post($url, [
-                'headers' => $headers,
-                'json' => $notification
+                'data' => $data
             ]);
 
-            $responseBody = json_decode($response->getBody(), true);
-            $this->logInfo('Notification sent to topic successfully.', $responseBody);
+            // Send the message to the topic
+            $messaging = Firebase::messaging();
+            $response = $messaging->send($message);
 
-            return $responseBody;
+            $this->logInfo('Notification sent to topic successfully', ['response' => $response]);
+            return $response;
         } catch (\Exception $e) {
             $this->logError('Failed to send notification to topic: ' . $e->getMessage());
             return false;
         }
     }
+
 
     public function markTopicAsDeleted($topic)
     {
