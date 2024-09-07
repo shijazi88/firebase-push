@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Kreait\Laravel\Firebase\Facades\Firebase; // Import Kreait Firebase facade
 use Illuminate\Support\Facades\DB;
+use Kreait\Firebase\Messaging\CloudMessage; // Import the correct class
 
 class FirebasePushService
 {
