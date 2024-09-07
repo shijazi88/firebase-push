@@ -292,9 +292,9 @@ class FirebasePushService
                 $response = $messaging->subscribeToTopic($topic, $tokens);
 
                 // Save the topic in the database if it doesn't exist
-                Topic::updateOrCreate(
-                    ['name' => $topic],
-                    ['created_at' => now(), 'updated_at' => now()] // Optional: Set other fields as needed
+                DB::table('topics')->updateOrInsert(
+                    ['name' => $topic], // The condition to check for existing record
+                    ['created_at' => now(), 'updated_at' => now()] // The fields to update or insert
                 );
 
 
@@ -338,10 +338,15 @@ class FirebasePushService
 
     public function markTopicAsDeleted($topic)
     {
-        $topicRecord = Topic::where('name', $topic)->first();
+        // Check if the topic exists in the database
+        $topicRecord = DB::table('topics')->where('name', $topic)->first();
+
         if ($topicRecord) {
-            $topicRecord->deleted_at = now();
-            $topicRecord->save();
+            // Update the `deleted_at` field for the topic
+            DB::table('topics')
+                ->where('name', $topic)
+                ->update(['deleted_at' => now(), 'updated_at' => now()]);
+
             $this->logInfo("Topic marked as deleted: " . $topic);
         } else {
             $this->logError("Topic not found: " . $topic);
