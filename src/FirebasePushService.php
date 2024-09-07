@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Kreait\Laravel\Firebase\Facades\Firebase; // Import Kreait Firebase facade
 
 class FirebasePushService
 {
