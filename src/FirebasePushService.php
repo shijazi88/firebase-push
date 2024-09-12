@@ -95,6 +95,12 @@ class FirebasePushService
             return false;
         }
 
+        // Ensure it's a file, not a directory
+        if (!is_file($this->serviceAccountPath)) {
+            $this->logError('The path provided is not a file: ' . $this->serviceAccountPath);
+            return false;
+        }
+
         $jsonKey = file_get_contents($this->serviceAccountPath);
         $decodedJson = json_decode($jsonKey, true);
 
