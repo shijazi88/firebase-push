@@ -279,10 +279,34 @@ class FirebasePushService
 
     // ----------- Topic Management with Kreait Firebase SDK ------------
 
-    public function subscribeToTopicV1($topic, $tokens)
+    public function subscribeToTopicV1Old($topic, $tokens)
     {
         return $this->manageTopicV1('subscribe', $topic, $tokens);
     }
+
+    public function subscribeToTopicV1($topic, $tokens)
+    {
+        try {
+            // Get Firebase messaging instance
+            $messaging = Firebase::messaging();
+
+            // Handle subscription
+            $response = $messaging->subscribeToTopic($topic, $tokens);
+
+            // Save the topic in the database if it doesn't exist
+            DB::table('firebase_topics')->updateOrInsert(
+                ['topic_name' => $topic], // The condition to check for existing record
+                ['created_at' => DB::raw('IFNULL(created_at, NOW())'), 'updated_at' => now()] // Don't change created_at if it exists
+            );
+
+            $this->logInfo("Topic management (subscribe) successful", $response);
+            return $response;
+        } catch (\Exception $e) {
+            $this->logError('Topic management failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
 
     public function unsubscribeFromTopicV1($topic, $tokens)
     {
